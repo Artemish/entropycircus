@@ -1,0 +1,12 @@
+[
+  {
+    "id": "start_zone",
+    "enemies": [
+      {"ship": "fighter", "pos": {"x": -200, "y": -500, "rot": "0"}},
+      {"ship": "fighter", "pos": {"x": 0, "y": 800, "rot": "0"}},
+      {"ship": "fighter", "pos": {"x": 1200, "y": 20, "rot": "0"}},
+      {"ship": "fighter", "pos": {"x": 2000, "y": 3200, "rot": "0"}},
+      {"ship": "fighter", "pos": {"x": 800, "y": 10000, "rot": "0"}}
+    ]
+  }
+]

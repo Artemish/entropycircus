@@ -1,10 +1,24 @@
 [
   {
-    "shipcode": "fighter",
+    "shipcode": "player_fighter",
     "radius": 10.0,
     "display": "Medium Fighter",
     "point_cost": 1,
     "shields": 2,
+    "hull": 2,
+    "movespeed": 6,
+    "evasion": "5+d6",
+    "attacks": [
+      {"name": "guns", "range": 3, "damage": "2+d2", "speed": 8},
+      {"name": "missiles", "range": 3, "damage": "2+d2", "speed": 6}
+    ]
+  },
+  {
+    "shipcode": "fighter",
+    "radius": 10.0,
+    "display": "Medium Fighter",
+    "point_cost": 1,
+    "shields": 8,
     "hull": 2,
     "movespeed": 6,
     "evasion": "5+d6",

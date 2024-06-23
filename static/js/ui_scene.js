@@ -1,85 +1,54 @@
 class UIScene extends Phaser.Scene {
     constructor() {
-        super({ key: 'UIScene'});
-        this.attackButtons = [];
-        this.moveButton = null;
-    }
-
-    preload() {
-        this.load.image('ui-background', 'assets/ui-background.jpg');
+        super({ key: 'UIScene', active: true });
     }
 
     create() {
-        // Create a container at the desired offset
-        let uiContainer = this.add.container(0, 400);
-        // Add UI elements to the container. Their positions are now relative to the container's origin
-        let scoreText = this.add.text(20, 20, 'Score: 0', { fontSize: '32px', fill: '#FFF' });
-        uiContainer.add(scoreText);
-
-        // Assuming 'background' is the key for your loaded image
-        var bg = this.add.image(0, 0, 'ui-background');
-        bg.setOrigin(0,0);
-
-        uiContainer.add(bg);
-
-        // Scale the image
-        bg.displayWidth = this.sys.game.config.width;
-        bg.displayHeight = 200;
-
-        this.container = uiContainer;
-
-        // You can listen for events from the MainScene or other parts of your game
-        // to update the UI accordingly
-        this.game.events.on('shipSelected', this.shipSelected, this);
-        this.game.events.on('attackSelected', this.attackSelected, this);
+        // Create graphics object for minimap
+        this.minimapGraphics = this.add.graphics();
     }
 
-    clearShipOptions() {
-        this.attackButtons.forEach(button => button.destroy());
-        this.attackButtons = [];
+    // update() {
+    //     this.renderMinimap();
+    // }
+    
 
-        if (this.moveButton) {
-          this.moveButton.destroy();
-          this.moveButton = null;
-        }
-    }
+    renderMinimap(ships, midpoint) {
+        // console.log("Ships in scene: ", ships);
 
-    addMoveButton() {
-        this.moveButton = this.add.text(10, 20, "Move", { fontSize: '20px', backgroundColor: '#444' })
-        this.container.add(this.moveButton);
+        const borderSize = 4;    // Size of the border
 
-        this.game.events.emit('moveSelected');
-    }
+        // Get the camera view width and height
+        const cameraWidth = this.cameras.main.width;
+        const cameraHeight = this.cameras.main.height;
 
-    showShipOptions(ship) {
-        const attacks = ship.attacks;
-        console.log("Rendering attacks: ", attacks);
+        const aspectRatio = cameraWidth / cameraHeight;
+        const minimapHeight = 100; // Size of the minimap
+        const minimapWidth = minimapHeight * aspectRatio; // Size of the minimap
 
-        // Clear existing attack buttons
-        this.clearShipOptions();
+        const startX = cameraWidth - minimapWidth - borderSize;
+        const startY = 0;
 
-        this.addMoveButton();
+        // Clear the previous minimap rendering
+        this.minimapGraphics.clear();
 
-        attacks.forEach((attack, index) => {
-            const button = this.add.text(
-              70 + index * 100, 20, attack.name,
-              { fontSize: '20px', backgroundColor: '#444' })
-            .setInteractive()
-            .on('pointerdown', () => this.game.events.emit('attackSelected', attack));
+        // Draw the black square with a white border
+        this.minimapGraphics.lineStyle(borderSize, 0xffffff); // White border
+        this.minimapGraphics.fillStyle(0x000000, 1);          // Black background
+        this.minimapGraphics.strokeRect(startX, startY, minimapWidth, minimapHeight);
+        this.minimapGraphics.fillRect(startX, startY, minimapWidth, minimapHeight);
 
-            button.attack = attack;
+        // Draw the blue dot representing the player in the center of the minimap
+        const centerX = startX + minimapWidth / 2 + borderSize;
+        const centerY = startY + minimapHeight / 2 + borderSize;
+        this.minimapGraphics.fillStyle(0x0000ff, 1); // Blue color
+        this.minimapGraphics.fillCircle(centerX, centerY, 5);
 
-            this.container.add(button);
-            this.attackButtons.push(button);
+        this.minimapGraphics.fillStyle(0xff0000, 1); // Blue color
+        ships.forEach((coords) => {
+          const shipX = Math.floor((coords.x / cameraWidth) * minimapWidth) + startX;
+          const shipY = Math.floor((coords.y / cameraHeight) * minimapHeight) + startY;
+          this.minimapGraphics.fillCircle(shipX, shipY, 5);
         });
-    }
-
-    shipSelected(ship) {
-        console.log("Rendering UI for ship..");
-        this.showShipOptions(ship);
-    }
-
-    attackSelected(attack) {
-        console.log("Attack selected: ", attack);
     }
 }

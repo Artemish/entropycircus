@@ -1,9 +1,29 @@
 var config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-    parent: 'game-container',
-    scene: [SetupScene, MainScene, UIScene] // Ensure both scenes are included
+    scale: {
+      mode: Phaser.Scale.RESIZE,
+      parent: 'game-container',
+      width: '100%',
+      height: '100%',
+    },
+    fps: {
+      target: 5,
+    },
+    physics: {
+        default: 'arcade', // Activates Arcade Physics
+        arcade: {
+            // gravity: { y: 300 }, 
+            // debug: true, // Set to true to see physics debug drawings
+        }
+    },
+    // scene: [TitleScene, MainScene] // Ensure both scenes are included
+    scene: [TitleScene, MainScene, UIScene] // Ensure both scenes are included
 };
 
 var game = new Phaser.Game(config);
+
+window.addEventListener('resize', function (event) {
+    // Optional: Custom logic to respond to the resize event
+    console.log("Refreshing..");
+    game.scale.refresh();
+});
