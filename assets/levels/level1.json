@@ -76,6 +76,7 @@
       ]
     },
     {"type": "new_objective", "objective": "Find the HKM battleship"},
+    {"type": "stage", "target": "level1_battleshipfight", "interactive": true},
     {"type": "wait_for_event", "event": "battleship_pinged"},
     {
       "type": "dialogue",

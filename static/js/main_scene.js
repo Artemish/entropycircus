@@ -17,7 +17,7 @@ class MainScene extends Phaser.Scene {
           this.load.image(ship.shipcode, `assets/ships/${ship.shipcode}.png`);
         });
 
-        this.load.json('stage', `assets/stages/${this.stage_id}.json`);
+        this.load.json(this.stage_id, `assets/stages/${this.stage_id}.json`);
     }
 
     setBackground() {
@@ -55,11 +55,11 @@ class MainScene extends Phaser.Scene {
     }
 
     create() {
-        this.stage = this.cache.json.get('stage');
+        this.stage = this.cache.json.get(this.stage_id);
         this.ships = this.physics.add.group();
         this.missiles = this.physics.add.group();
         this.hitsound = this.sound.add('hitsound');
-        this.shipIDMap = new Map()
+        this.shipIDMap = new Map();
 
         // console.log('Selected Ship:', this.ship);
         this.setBackground();

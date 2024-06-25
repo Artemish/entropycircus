@@ -86,10 +86,17 @@ class GameScene extends Phaser.Scene {
     }
 
     handleStage(target, interactive) {
-        this.scene.launch('MainScene', target);
+        let mainScene = this.scene.get('MainScene');
+
+        if (mainScene.scene.isActive()) {
+          mainScene.scene.restart(target);
+        } else {
+          this.scene.start('MainScene', target);
+        }
+
         if (interactive) {
-          console.log("[GAME] Pausing while scene plays out");
-          this.scene.pause();
+          // console.log("[GAME] Pausing while scene plays out");
+          // this.scene.pause();
         }
     }
 }
