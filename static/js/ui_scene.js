@@ -11,7 +11,6 @@ class UIScene extends Phaser.Scene {
     // update() {
     //     this.renderMinimap();
     // }
-    
 
     renderMinimap(ships, midpoint) {
         // console.log("Ships in scene: ", ships);

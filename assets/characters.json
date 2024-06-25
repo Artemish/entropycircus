@@ -1,0 +1,26 @@
+{
+  "jester_22": {
+    "name": "Jester 22",
+    "portrait": "jester_potential.jpg"
+  },
+  "ringleader": {
+    "name": "Ring Leader",
+    "portrait": "anime_ring_leader_maybe.jpg"
+  },
+  "tanizaki": {
+    "name": "Ensign Tanizaki",
+    "portrait": "anime_ensign_Tanizaki.jpg"
+  },
+  "captain_rand": {
+    "name": "Captain Rand",
+    "portrait": "anime_captain_rand.jpg"
+  },
+  "high_command": {
+    "name": "High Command",
+    "portrait": "anime_high_command_member.jpg"
+  },
+  "admiral_luci": {
+    "name": "Admiral Luci",
+    "portrait": "anime_admiral_luci.jpg"
+  }
+}

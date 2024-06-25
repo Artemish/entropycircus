@@ -3,6 +3,11 @@ class MainScene extends Phaser.Scene {
         super({ key: 'MainScene' });
     }
 
+    init(stage_id) {
+        console.log('In MainScene.js:init()', stage_id);
+        this.stage_id = stage_id;
+    }
+
     preload() { 
         this.load.image('gameover', 'assets/gameover.png');
         const shipdata = this.cache.json.get('shipdata');
@@ -11,10 +16,8 @@ class MainScene extends Phaser.Scene {
           console.log(`Loading asset for ${ship.shipcode}`);
           this.load.image(ship.shipcode, `assets/ships/${ship.shipcode}.png`);
         });
-    }
 
-    init() {
-        console.log('In MainScene.js:init()');
+        this.load.json('stage', `assets/stages/${this.stage_id}.json`);
     }
 
     setBackground() {
@@ -52,54 +55,69 @@ class MainScene extends Phaser.Scene {
     }
 
     create() {
+        this.stage = this.cache.json.get('stage');
         this.ships = this.physics.add.group();
         this.missiles = this.physics.add.group();
         this.hitsound = this.sound.add('hitsound');
+        this.shipIDMap = new Map()
 
         // console.log('Selected Ship:', this.ship);
         this.setBackground();
-        const shipcode = 'player_fighter';
-
-        console.log("Going with ship: ", this.ship);
-
-        // Define the arrow keys for input
-        this.cursors = this.input.keyboard.createCursorKeys();
-        this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-
-        // Create a Ship instance
-        this.ship = new Ship(this, this.cameras.main.centerX, this.cameras.main.centerY, shipcode);
-        this.input.on('pointerdown', () => {
-            if (this.ship.active) {
-              this.ship.fireMissile(800);
-            }
-        });
-
-        // Camera follows the ship
-        this.cameras.main.startFollow(this.ship, true, 0.9, 0.9);
-
-        // Setting up the physics for the ship
-        this.physics.world.enable(this.ship);
 
         let enemies = this.physics.add.group();
 
-        this.spawn_enemies();
+        this.spawn_ships();
 
-        // Register collision detection between ships
-        this.physics.add.collider(this.ships, this.ships, this.handleShipCollision, null, this);
+        if (this.shipIDMap.has('PLAYER')) {
+          this.ship = this.shipIDMap.get('PLAYER');
 
-        // Register collision detection between ships and missiles
-        this.physics.add.collider(this.ships, this.missiles, this.handleShipMissileCollision, this.should_missile_collide, this);
+          // Setting up the physics for the ship
+          this.physics.world.enable(this.ship);
+        }
 
-        // Register a callback for when the player ship is destroyed
-        this.ship.once('destroy', this.onPlayerShipDestroyed, this);
+        if (this.stage.interactive) {
+          this.input.on('pointerdown', () => {
+              if (this.ship.active) {
+                this.ship.fireMissile(800);
+              }
+          });
 
-        // Create a key object for the 'W' key
-        this.wKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
-        this.aKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-        this.dKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+          // Register collision detection between ships
+          this.physics.add.collider(this.ships, this.ships, this.handleShipCollision, null, this);
 
-        // Get the UI scene
-        this.uiScene = this.scene.get('UIScene');
+          // Register collision detection between ships and missiles
+          this.physics.add.collider(this.ships, this.missiles, this.handleShipMissileCollision, this.should_missile_collide, this);
+
+          // Register a callback for when the player ship is destroyed
+          this.shipIDMap.get('PLAYER').once('destroy', this.onPlayerShipDestroyed, this);
+
+          // Create a key object for the 'W' key
+          this.wKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+          this.aKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+          this.dKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        }
+
+        if (this.stage.camera) {
+          const followShip = this.shipIDMap.get(this.stage.camera);
+          console.log('[MAIN] Camera following: ', followShip);
+          this.cameras.main.startFollow(followShip, true, 1.0, 1.0);
+        }
+
+        if (this.stage.interactive) {
+          // Define the arrow keys for input
+          this.cursors = this.input.keyboard.createCursorKeys();
+          this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+          // Get the UI scene
+          this.uiScene = this.scene.get('UIScene');
+        }
+
+        console.log("Emitting event: scene_ready");
+        this.scene.get('GameScene').events.emit('scene_ready', {scene: 'MainScene'});
+    }
+
+    dummyListener(data) {
+      console.log("[EVENT] ", data);
     }
 
     onPlayerShipDestroyed() {
@@ -121,19 +139,23 @@ class MainScene extends Phaser.Scene {
       return missile.firer != ship;
     }
 
-    spawn_enemies() {
-        const level_id = "start_zone";
-        const levels = this.cache.json.get('levels');
-        const level = levels.find(level => level.id == level_id);
-
-        console.log("Loading level: ", level);
-        level.enemies.forEach(enemy => this.spawn_enemy(enemy, this.ship));
+    spawn_ships() {
+        this.stage.ships.forEach(ship_info => this.spawn_ship(ship_info));
     }
 
-    spawn_enemy(enemy, target) {
-        var enemy_ship = new Ship(this, enemy.pos.x, enemy.pos.y, enemy.ship);
-        enemy_ship.setRotation(enemy.pos.rot * (6.28 / 360));
-        enemy_ship.set_target(target);
+    spawn_ship(ship_info, target) {
+        var ship = new Ship(this, ship_info.pos.x, ship_info.pos.y, ship_info.ship);
+        ship.setRotation(ship_info.pos.rot * (6.28 / 360));
+        if (target) { 
+          ship.set_target(target);
+        }
+
+        if (ship_info.id) {
+          this.shipIDMap.set(ship_info.id, ship);
+        }
+
+        ship.body.velocity.y = 450;
+        ship.body.setDrag(0);
     }
 
     handleShipCollision(ship1, ship2) {
@@ -171,11 +193,20 @@ class MainScene extends Phaser.Scene {
     }
 
     update() {
-        this.point_ship_towards_cursor();
-
         // console.log(this.starField);
         this.starField.x = this.cameras.main.scrollX;
         this.starField.y = this.cameras.main.scrollY;
+
+        this.ships.children.iterate((ship) => {ship.update();});
+
+        // Filter ships to only those in view
+        var coords = this.getInViewShipCoords();
+
+
+        if (this.stage.interactive) {
+            this.point_ship_towards_cursor();
+            this.uiScene.renderMinimap(coords, this.cameras.main.midPoint);
+        }
 
         if (this.ship.active) {
           // console.log("Main scene ship: ", this.ship);
@@ -194,26 +225,21 @@ class MainScene extends Phaser.Scene {
           // this.starField.tilePositionY = this.starField.tilePositionY % 4096;
 
           // Control the ship's movement based on arrow key input
-          if (this.aKey.isDown) {
-              this.ship.body.setAngularVelocity(-150);
-          } else if (this.dKey.isDown) {
-              this.ship.body.setAngularVelocity(150);
-          } else {
-              this.ship.body.setAngularVelocity(0);
-          }
+          if (this.interactive) {
+            if (this.aKey.isDown) {
+                this.ship.body.setAngularVelocity(-150);
+            } else if (this.dKey.isDown) {
+                this.ship.body.setAngularVelocity(150);
+            } else {
+                this.ship.body.setAngularVelocity(0);
+            }
 
-          if (this.wKey.isDown) {
-              this.physics.velocityFromRotation(this.ship.rotation, this.ship.moveSpeed * 20, this.ship.body.acceleration);
-          } else {
-              this.ship.body.setAcceleration(0);
+            if (this.wKey.isDown) {
+                this.physics.velocityFromRotation(this.ship.rotation, this.ship.moveSpeed * 20, this.ship.body.acceleration);
+            } else {
+                this.ship.body.setAcceleration(0);
+            }
           }
         }
-
-        this.ships.children.iterate((ship) => {ship.update();});
-
-        // Filter ships to only those in view
-        var coords = this.getInViewShipCoords();
-
-        this.uiScene.renderMinimap(coords, this.cameras.main.midPoint);
     }
 }

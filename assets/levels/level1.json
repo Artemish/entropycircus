@@ -1,0 +1,137 @@
+{
+  "title": "The Circus Awaits",
+  "characters": [
+    "jester_22",
+    "ringleader",
+    "tanizaki",
+    "captain_rand",
+    "admiral_luci"
+  ],
+  "sequence": [
+    {
+      "type": "journallog",
+      "lines": [
+        "April 18th, 2828 AD",
+        "Today marks the eight year anniversary of the HKM Uriel incident.",
+        "Eight years of war. I see no end in sight.",
+        "May God save our Greater United Nations.",
+        "-Journal entry, Ring Leader"
+      ]
+    },
+    { "type": "stage", "target": "level1_withthecrew", "interactive": false},
+    {
+      "type": "dialogue",
+      "script": [
+        {
+          "speaker": "ringleader", 
+          "lines": [
+            "Welcome aboard, lieutenant."
+          ]
+        },
+        {
+          "speaker": "jester_22", 
+          "lines": [
+            "Thank you, sir."
+          ]
+        },
+        {
+          "speaker": "ringleader", 
+          "lines": [
+            "Looks like you’ve been with the 140th fleet for the duration of your service.",
+            "It’s true that you led a squad of medium fighters in the battle for Epsilon Eridani as an ensign?"
+          ]
+        },
+        {
+          "speaker": "jester_22", 
+          "lines": [
+            "Affirmative, sir. My squad leader took a direct lance blast, so I assumed control."
+          ]
+        },
+        {
+          "speaker": "ringleader", 
+          "lines": [
+            "War is hell, lieutenant. It seems to me that you got results. Am I wrong?"
+          ]
+        },
+        {
+          "speaker": "jester_22", 
+          "lines": [
+            "I completed the mission, sir."
+          ]
+        },
+        {
+          "speaker": "ringleader", 
+          "lines": [
+            "Good. You’re now in charge of the 2nd squadron. You’ll bear the callsign Jester 22.",
+            "There will be time for formalities and introductions later. We’re about to engage an enemy strike force with critical info.",
+            "You are to scout the area, find the enemy battleship, and ping its location."
+          ]
+        },
+        {
+          "speaker": "ringleader", 
+          "lines": [
+            "Sir, yes, sir."
+          ]
+        }
+      ]
+    },
+    {"type": "new_objective", "objective": "Find the HKM battleship"},
+    {"type": "wait_for_event", "event": "battleship_pinged"},
+    {
+      "type": "dialogue",
+      "script": [
+        {
+          "speaker": "tanizaki", 
+          "lines": [
+            "Sir, we received the coordinates."
+          ]
+        },
+        {
+          "speaker": "ringleader", 
+          "lines": [
+            "Good. Wolfpack, you may move in range and fire at your earliest convenience."
+          ]
+        },
+        {
+          "speaker": "captain_rand", 
+          "lines": [
+            "On it. Lance’s II, III, IV, and V follow me."
+          ]
+        }
+      ]
+    },
+    { "type": "scene", "target": "wolfpack_charge" },
+    {
+      "type": "dialogue",
+      "script": [
+        {
+          "speaker": "ringleader", 
+          "lines": [
+            "Splendid, all fighters return to the fleet.",
+            "Captain Rand, you and your lances are to scan the wreckage for intelligence."
+          ]
+        },
+        {
+          "speaker": "captain_rand", 
+          "lines": [
+            "Acknowledged."
+          ]
+        }
+      ]
+    },
+    {"type": "new_objective", "objective": "Return to Entropy Circus"},
+    {"type": "wait_for_event", "event": "returned_to_entropy_circus"},
+    {
+      "type": "dialogue",
+      "script": [
+        {
+          "speaker": "ringleader", 
+          "lines": [
+            "Good work everyone. I’ll brief High Command on our success.",
+            "Jester 22, welcome to the Entropy Circus. I think you’ll fit in just fine."
+          ]
+        }
+      ]
+    }
+  ]
+}

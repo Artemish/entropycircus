@@ -1,5 +1,5 @@
 class Ship extends Phaser.GameObjects.Sprite {
-    constructor(scene, x, y, shipcode) {
+    constructor(scene, x, y, shipcode, id) {
         const shipdata = scene.cache.json.get('shipdata');
         const ship = shipdata.find(ship => ship.shipcode == shipcode);
 
@@ -8,6 +8,7 @@ class Ship extends Phaser.GameObjects.Sprite {
 
         this.scene = scene;
 
+        this.id = id;
         // Custom properties based on ship
         this.shipCode = ship.shipcode;
         this.radius = ship.radius;
@@ -44,11 +45,13 @@ class Ship extends Phaser.GameObjects.Sprite {
         this.target = null;
 
         // Create graphics for health and shield bars
-        this.healthBar = scene.add.graphics();
-        this.shieldBar = scene.add.graphics();
-        this.updateBars();
+        // this.healthBar = scene.add.graphics();
+        // this.shieldBar = scene.add.graphics();
+        // this.updateBars();
 
         this.fireMissileTimer = null;
+
+        // this.once('destroy', this.onPlayerShipDestroyed, this);
     }
 
 
@@ -104,7 +107,7 @@ class Ship extends Phaser.GameObjects.Sprite {
       if (this.has_target()) {
         this.move_towards_target();
       }
-      this.updateBars();
+      // this.updateBars();
     }
 
     // Example method: damage the ship

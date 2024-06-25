@@ -7,7 +7,8 @@ var config = {
       height: '100%',
     },
     fps: {
-      target: 5,
+      target: 30,
+      forceSetTimeOut: true
     },
     physics: {
         default: 'arcade', // Activates Arcade Physics
@@ -16,8 +17,14 @@ var config = {
             // debug: true, // Set to true to see physics debug drawings
         }
     },
-    // scene: [TitleScene, MainScene] // Ensure both scenes are included
-    scene: [TitleScene, MainScene, UIScene] // Ensure both scenes are included
+    scene: [
+      TitleScene,
+      MainScene,
+      UIScene,
+      DialogueScene,
+      GameScene,
+      JournalLogScene,
+    ] 
 };
 
 var game = new Phaser.Game(config);
