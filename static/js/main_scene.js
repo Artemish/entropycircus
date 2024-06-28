@@ -9,6 +9,7 @@ class MainScene extends Phaser.Scene {
     }
 
     preload() { 
+        this.load.image('ping', 'assets/ping.png');
         this.load.image('gameover', 'assets/gameover.png');
         const shipdata = this.cache.json.get('shipdata');
         console.log("Found ship data: ", shipdata);
@@ -20,6 +21,23 @@ class MainScene extends Phaser.Scene {
         this.load.json(this.stage_id, `assets/stages/${this.stage_id}.json`);
     }
 
+    adjustZoom(deltaY) {
+        const zoomFactor = 0.1; // Change this value to adjust the zoom sensitivity
+        const minZoom = 0.5; // Minimum zoom level
+        const maxZoom = 2; // Maximum zoom level
+
+        let newZoom = this.cameras.main.zoom;
+
+        if (deltaY > 0) {
+          newZoom -= zoomFactor;
+        } else if (deltaY < 0) {
+          newZoom += zoomFactor;
+        }
+
+        newZoom = Phaser.Math.Clamp(newZoom, minZoom, maxZoom);
+        this.cameras.main.setZoom(newZoom);
+    }
+
     setBackground() {
         // Assuming your world is larger than the screen
         const width = this.sys.game.config.width;
@@ -29,6 +47,7 @@ class MainScene extends Phaser.Scene {
 
         console.log("Adding starfield");
         this.starField = this.add.tileSprite(0, 0, width*2, height*2, 'star_field_far');
+        this.starField.setScale(3.0);
     }
 
     getInViewShipCoords() {
@@ -49,6 +68,18 @@ class MainScene extends Phaser.Scene {
                   'y': ship.y - cameraOrigin.y
               });
           }
+      });
+
+      return results;
+    }
+
+    getAllShipCoords() {
+      var results = [];
+      this.ships.getChildren().forEach((ship) => {
+          results.push({
+              'x': ship.x,
+              'y': ship.y
+          });
       });
 
       return results;
@@ -80,6 +111,10 @@ class MainScene extends Phaser.Scene {
               if (this.ship.active) {
                 this.ship.fireMissile(800);
               }
+          });
+
+          this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
+              this.adjustZoom(deltaY);
           });
 
           // Register collision detection between ships
@@ -145,6 +180,13 @@ class MainScene extends Phaser.Scene {
 
     spawn_ship(ship_info, target) {
         var ship = new Ship(this, ship_info.pos.x, ship_info.pos.y, ship_info.ship);
+
+        if (this.stage.velocity) {
+          ship.body.velocity.x = this.stage.velocity.x;
+          ship.body.velocity.y = this.stage.velocity.y;
+          ship.body.setDrag(0);
+        }
+
         ship.setRotation(ship_info.pos.rot * (6.28 / 360));
         if (target) { 
           ship.set_target(target);
@@ -154,8 +196,8 @@ class MainScene extends Phaser.Scene {
           this.shipIDMap.set(ship_info.id, ship);
         }
 
-        ship.body.velocity.y = 450;
-        ship.body.setDrag(0);
+        // ship.body.velocity.y = 450;
+        // ship.body.setDrag(0);
     }
 
     handleShipCollision(ship1, ship2) {
@@ -177,8 +219,8 @@ class MainScene extends Phaser.Scene {
 
     point_ship_towards_cursor() {
         const camera = this.cameras.main;
-        const centerX = camera.displayWidth / 2;
-        const centerY = camera.displayHeight / 2;
+        const centerX = camera.centerX;// const centerX = camera.displayWidth / 2;
+        const centerY = camera.centerY;// const centerY = camera.displayHeight / 2;
 
         // Get the pointer (mouse) position
         const pointer = this.input.activePointer;
@@ -199,13 +241,9 @@ class MainScene extends Phaser.Scene {
 
         this.ships.children.iterate((ship) => {ship.update();});
 
-        // Filter ships to only those in view
-        var coords = this.getInViewShipCoords();
-
-
         if (this.stage.interactive) {
             this.point_ship_towards_cursor();
-            this.uiScene.renderMinimap(coords, this.cameras.main.midPoint);
+            this.uiScene.renderMinimap(this.ships.getChildren());
         }
 
         if (this.ship.active) {
@@ -225,7 +263,7 @@ class MainScene extends Phaser.Scene {
           // this.starField.tilePositionY = this.starField.tilePositionY % 4096;
 
           // Control the ship's movement based on arrow key input
-          if (this.interactive) {
+          if (this.stage.interactive) {
             if (this.aKey.isDown) {
                 this.ship.body.setAngularVelocity(-150);
             } else if (this.dKey.isDown) {

@@ -7,7 +7,7 @@ class GameScene extends Phaser.Scene {
 
     preload() {
         this.load.json('level', 'assets/levels/level1.json');
-        this.load.audio('bgm', 'assets/music/hark_the_crimson_drake_ost_3.mp3');
+        this.load.audio('bgm', 'assets/music/01_entropy_circus.mp3');
     }
 
     create() {
@@ -54,7 +54,7 @@ class GameScene extends Phaser.Scene {
                 this.handleNewObjective(event.objective);
                 break;
             case 'wait_for_event':
-                this.handleWaitForEvent(event.event);
+                this.handleWaitForEvent(event.event, event.target);
                 break;
             default:
                 console.warn('Unknown event type:', event.type);
@@ -79,9 +79,10 @@ class GameScene extends Phaser.Scene {
         this.processNextEvent();
     }
 
-    handleWaitForEvent(eventName) {
-        this.events.once(eventName, () => {
-            this.processNextEvent();
+    handleWaitForEvent(eventName, targetId) {
+        const mainScene = this.scene.get('MainScene');
+        mainScene.shipIDMap.get(targetId).once(eventName, () => {
+          this.processNextEvent();
         });
     }
 

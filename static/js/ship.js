@@ -1,5 +1,5 @@
 class Ship extends Phaser.GameObjects.Sprite {
-    constructor(scene, x, y, shipcode, id) {
+    constructor(scene, x, y, shipcode, id, team) {
         const shipdata = scene.cache.json.get('shipdata');
         const ship = shipdata.find(ship => ship.shipcode == shipcode);
 
@@ -9,6 +9,7 @@ class Ship extends Phaser.GameObjects.Sprite {
         this.scene = scene;
 
         this.id = id;
+        this.team = team;
         // Custom properties based on ship
         this.shipCode = ship.shipcode;
         this.radius = ship.radius;
@@ -121,11 +122,15 @@ class Ship extends Phaser.GameObjects.Sprite {
         if (this.hull <= 0) {
             this.destroy();
         }
-        this.updateBars();
+        // this.updateBars();
     }
 
     fireMissile(speed) {
-        const missile = new Missile(this.scene, this.x, this.y, this, speed);
+        const missile = new Missile(this.scene, this.x, this.y, speed);
+    }
+
+    firePing() {
+        const ping = new Ping(this.scene, this.x, this.y, this);
     }
 
     destroy(fromScene) {

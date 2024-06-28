@@ -13,6 +13,7 @@ class TitleScene extends Phaser.Scene {
         this.load.image('background', 'assets/background.jpg');
         this.load.image('star_field_far', 'assets/star_field_far.png');
         this.load.image('star_field_close', 'assets/star_field_close.png');
+        this.load.image('nasa_level_1_bg', 'assets/NASA_level_1.jpg');
         this.load.image('bullet', 'assets/bullet.webp');
         this.load.audio('hitsound', 'assets/hitsound.wav');
     }
@@ -37,9 +38,6 @@ class TitleScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-SPACE', this.handleSelect.bind(this));
         
         this.input.on('pointerdown', this.handleSelect.bind(this));
-    }
-
-    update() {
     }
 
     handleDown() { 
