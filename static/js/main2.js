@@ -6,6 +6,7 @@ class MainScene extends Phaser.Scene {
     init(stage_id) {
         console.log('In MainScene.js:init()', stage_id);
         this.stage_id = stage_id;
+
         this.cooldowns = {
             missile: 0,
             ping: 0
@@ -15,7 +16,6 @@ class MainScene extends Phaser.Scene {
     preload() { 
         this.load.image('ping', 'assets/ping.png');
         this.load.image('gameover', 'assets/gameover.png');
-
         const shipdata = this.cache.json.get('shipdata');
         console.log("Found ship data: ", shipdata);
         shipdata.forEach((ship) => {
@@ -24,8 +24,6 @@ class MainScene extends Phaser.Scene {
         });
 
         this.load.json(this.stage_id, `assets/stages/${this.stage_id}.json`);
-        
-        this.load.audio('playerDead', 'assets/sfx/player_death.mp3');
     }
 
     adjustZoom(deltaY) {
@@ -57,48 +55,11 @@ class MainScene extends Phaser.Scene {
         this.starField.setScale(3.0);
     }
 
-    getInViewShipCoords() {
-      const camera = this.cameras.main;
-      const worldView = camera.worldView;
-      const cameraOrigin = camera.getWorldPoint(0, 0);
-
-      var results = [];
-      this.ships.getChildren().forEach((ship) => {
-          if (ship == this.ship) {
-            return;
-          }
-
-          const bounds = ship.getBounds();
-          if (Phaser.Geom.Intersects.RectangleToRectangle(bounds, worldView)) {
-              results.push({
-                  'x': ship.x - cameraOrigin.x,
-                  'y': ship.y - cameraOrigin.y
-              });
-          }
-      });
-
-      return results;
-    }
-
-    getAllShipCoords() {
-      var results = [];
-      this.ships.getChildren().forEach((ship) => {
-          results.push({
-              'x': ship.x,
-              'y': ship.y
-          });
-      });
-
-      return results;
-    }
-
     create() {
         this.stage = this.cache.json.get(this.stage_id);
         this.ships = this.physics.add.group();
         this.missiles = this.physics.add.group();
-        this.hitsound = this.sound.add('missile_hit');
-        this.playerDead = this.sound.add('playerDead');
-        this.sfx_missile_fired = this.sound.add('missile_fired');
+        this.hitsound = this.sound.add('hitsound');
         this.shipIDMap = new Map();
 
         // console.log('Selected Ship:', this.ship);
@@ -116,8 +77,9 @@ class MainScene extends Phaser.Scene {
         }
 
         if (this.stage.interactive) {
-          this.input.keyboard.on('keydown-Q', this.handleFireMissile, this);
-          this.input.keyboard.on('keydown-E', this.handleFirePing, this);
+          // Input handling
+          this.input.keyboard.on('keydown_Q', this.handleFireMissile, this);
+          this.input.keyboard.on('keydown_E', this.handleFirePing, this);
 
           this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
               this.adjustZoom(deltaY);
@@ -132,10 +94,17 @@ class MainScene extends Phaser.Scene {
           // Register a callback for when the player ship is destroyed
           this.shipIDMap.get('PLAYER').once('destroy', this.onPlayerShipDestroyed, this);
 
-          // Create a key object for the 'W' key
-          this.wKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
-          this.aKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-          this.dKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+          // Using WASD movement 
+          // this.wKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+          // this.aKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+          // this.dKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+
+          // Define the arrow keys for input
+          this.cursors = this.input.keyboard.createCursorKeys();
+          this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+          // Get the UI scene
+          this.uiScene = this.scene.get('UIScene');
         }
 
         if (this.stage.camera) {
@@ -144,60 +113,22 @@ class MainScene extends Phaser.Scene {
           this.cameras.main.startFollow(followShip, true, 1.0, 1.0);
         }
 
-
-        if (this.stage.interactive) {
-          // Define the arrow keys for input
-          this.cursors = this.input.keyboard.createCursorKeys();
-          this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-
-          // Get the UI scene
-          this.uiScene = this.scene.get('UIScene');
-          this.uiScene.renderHotbar();
-
-          this.uiTimer = this.time.addEvent({
-            delay: 250,
-            callback: this.renderUI,
-            callbackScope: this,
-            loop: true
-          });
-
-          this.enemyTimer = this.time.addEvent({
-            delay: 5000,
-            callback: this.spawnOneEnemy,
-            callbackScope: this,
-            loop: true,
-          });
-        }
+        this.uiTimer = this.time.addEvent({
+          delay: 250,
+          callback: this.renderUI(),
+          callbackScope: this,
+          loop: true
+        });
 
         console.log("Emitting event: scene_ready");
         this.scene.get('GameScene').events.emit('scene_ready', {scene: 'MainScene'});
-
-        this.gameoverMusic = this.sound.add('gameover_music');
-    }
-
-    spawnOneEnemy() {
-      const target = this.ship;
-      const distance = 1000;
-      const angle = Phaser.Math.FloatBetween(0, Math.PI * 2);
-
-      // Calculate the new x and y positions
-      const x = target.x + Math.cos(angle) * distance;
-      const y = target.y + Math.sin(angle) * distance;
-
-      const ship_info = {
-        ship: "7th_fleet_fighter",
-        team: "enemy",
-        pos: {x: x, y: y, rot: angle}
-      };
-
-      this.spawn_ship(ship_info, target)
     }
 
     handleFireMissile() {
         const currentTime = this.time.now;
 
         if (currentTime > this.cooldowns.missile) {
-            this.ship.fireMissile(400);
+            this.ship.fireMissile();
             this.cooldowns.missile = currentTime + 1000; // 1 second cooldown
         } else {
             console.log('Missile is on cooldown!');
@@ -215,36 +146,17 @@ class MainScene extends Phaser.Scene {
         }
     }
 
-
-
-    renderUI() {
-        if (this.stage.interactive) {
-            this.uiScene.renderMinimap(this.ships.getChildren());
-            this.uiScene.renderCooldowns(this.cooldowns);
-        }
-    }
-
-    dummyListener(data) {
-      console.log("[EVENT] ", data);
-    }
-
     onPlayerShipDestroyed() {
         // Get the center of the camera
         const camera = this.cameras.main;
         const centerX = camera.worldView.x + camera.worldView.width / 2;
         const centerY = camera.worldView.y + camera.worldView.height / 2;
 
-        this.game.sound.stopAll();
-        this.playerDead.play();
-        this.gameoverMusic.play();
-
         this.add.image(centerX, centerY, 'gameover').setOrigin(0.5); // Display Game Over image
         this.add.text(centerX, centerY+200, 'Press space to retry', { fontSize: '16px', fill: '#ffffff' }).setOrigin(0.5);
 
         // Firing mechanism
         this.spaceBar.on('down', () => {
-            this.gameoverMusic.stop();
-            this.scene.get('GameScene').startBGM();
             this.scene.restart();
         });
     }
@@ -313,6 +225,12 @@ class MainScene extends Phaser.Scene {
         this.ship.setRotation(angle);
     }
 
+    renderUI() {
+        if (this.stage.interactive) {
+            this.uiScene.renderMinimap(this.ships.getChildren());
+        }
+    }
+
     update() {
         // console.log(this.starField);
         this.starField.x = this.cameras.main.scrollX;
@@ -322,7 +240,6 @@ class MainScene extends Phaser.Scene {
 
         if (this.stage.interactive) {
             this.point_ship_towards_cursor();
-            this.uiScene.renderMinimap(this.ships.getChildren());
         }
 
         if (this.ship.active) {

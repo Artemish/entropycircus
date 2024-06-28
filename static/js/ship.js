@@ -31,6 +31,9 @@ class Ship extends Phaser.GameObjects.Sprite {
 
         this.scene = scene;
 
+        if (ship.mass) {
+          this.body.setMass(ship.mass);
+        }
         this.body.setDrag(20);
         this.body.setBounce(0);
         this.body.setMaxSpeed(200);
@@ -126,7 +129,8 @@ class Ship extends Phaser.GameObjects.Sprite {
     }
 
     fireMissile(speed) {
-        const missile = new Missile(this.scene, this.x, this.y, speed);
+        this.scene.sfx_missile_fired.play();
+        const missile = new Missile(this.scene, this.x, this.y, this, speed);
     }
 
     firePing() {

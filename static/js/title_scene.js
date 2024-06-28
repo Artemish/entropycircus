@@ -15,7 +15,12 @@ class TitleScene extends Phaser.Scene {
         this.load.image('star_field_close', 'assets/star_field_close.png');
         this.load.image('nasa_level_1_bg', 'assets/NASA_level_1.jpg');
         this.load.image('bullet', 'assets/bullet.webp');
-        this.load.audio('hitsound', 'assets/hitsound.wav');
+
+        this.load.audio('hitsound', 'assets/sfx/machinegun_hit.mp3');
+        this.load.audio('missile_hit', 'assets/sfx/missile_hit.mp3');
+        this.load.audio('missile_fired', 'assets/sfx/missile_fired.mp3');
+        this.load.audio('gameover_music', 'assets/music/game_over.mp3');
+        this.load.audio('menu_select', 'assets/sfx/menu_select.mp3');
     }
 
     create() {
@@ -38,6 +43,8 @@ class TitleScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-SPACE', this.handleSelect.bind(this));
         
         this.input.on('pointerdown', this.handleSelect.bind(this));
+
+        this.selectSound = this.sound.add('menu_select');
     }
 
     handleDown() { 
@@ -45,6 +52,7 @@ class TitleScene extends Phaser.Scene {
       if (this.selectionIndex < 1) {
         this.selectionIndex = 1;
         this.selectionTriangle.setY(400);
+        this.selectSound.play();
       }
     }
 
@@ -53,12 +61,14 @@ class TitleScene extends Phaser.Scene {
       if (this.selectionIndex > 0) {
         this.selectionIndex -= 1;
         this.selectionTriangle.setY(300);
+        this.selectSound.play();
       }
     }
 
     handleSelect() {
         console.log("SELECT", this.selectionIndex);
         if (this.selectionIndex === 0) {
+            this.selectSound.play();
             this.startNewGame();
         } else if (this.selectionIndex === 1) {
             this.exitGame();

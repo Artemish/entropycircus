@@ -46,9 +46,10 @@
     "radius": 30.0,
     "display": "Lance (7th Fleet)",
     "point_cost": 4,
-    "shields": 8,
-    "hull": 12,
+    "shields": 15,
+    "hull": 30,
     "movespeed": 4,
+    "mass": 100,
     "evasion": "5+d6",
     "attacks": [
       {"name": "guns", "range": 3, "damage": "2+d2", "speed": 8, "copies": 4},

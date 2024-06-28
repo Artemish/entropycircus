@@ -10,6 +10,10 @@ class GameScene extends Phaser.Scene {
         this.load.audio('bgm', 'assets/music/01_entropy_circus.mp3');
     }
 
+    startBGM() {
+        this.bgm.play();
+    }
+
     create() {
         this.levelData = this.cache.json.get('level');
         console.log("[GAME] Starting level: ", this.levelData);
@@ -19,7 +23,7 @@ class GameScene extends Phaser.Scene {
 
         this.sound.pauseOnBlur = false;
         
-        this.events.on('scene_ready', this.handleSceneFullyRendered, this);
+        this.events.once('scene_ready', this.handleSceneFullyRendered, this);
 
         this.processNextEvent();
     }
