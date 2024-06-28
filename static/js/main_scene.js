@@ -244,7 +244,7 @@ class MainScene extends Phaser.Scene {
         // Firing mechanism
         this.spaceBar.on('down', () => {
             this.gameoverMusic.stop();
-            this.scene.get('GameScene').startBGM();
+            this.scene.get('GameScene').resetStage();
             this.scene.restart();
         });
     }

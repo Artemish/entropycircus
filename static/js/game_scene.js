@@ -2,16 +2,13 @@ class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
         this.sequenceIndex = 0;
+        this.lastStage = -1;
         console.log("[GAME] active: ", this.config);
     }
 
     preload() {
         this.load.json('level', 'assets/levels/level1.json');
         this.load.audio('bgm', 'assets/music/01_entropy_circus.mp3');
-    }
-
-    startBGM() {
-        this.bgm.play();
     }
 
     create() {
@@ -23,7 +20,7 @@ class GameScene extends Phaser.Scene {
 
         this.sound.pauseOnBlur = false;
         
-        this.events.once('scene_ready', this.handleSceneFullyRendered, this);
+        this.events.on('scene_ready', this.handleSceneFullyRendered, this);
 
         this.processNextEvent();
     }
@@ -32,6 +29,11 @@ class GameScene extends Phaser.Scene {
         console.log(`${data.scene} is fully rendered`);
         // Process the next event or any other logic
         this.processNextEvent();
+    }
+
+    resetStage() {
+      this.sequenceIndex = this.lastStage;
+      this.bgm.play();
     }
 
     processNextEvent() {
@@ -49,6 +51,7 @@ class GameScene extends Phaser.Scene {
                 this.handleJournalLog(event);
                 break;
             case 'stage':
+                this.lastStage = this.sequenceIndex;
                 this.handleStage(event.target, event.interactive);
                 break;
             case 'dialogue':

@@ -23,6 +23,11 @@ class Ping extends Phaser.GameObjects.Sprite {
     }
 
     update() {
+        // TODO figure out how this is possible
+        if (this.scene === undefined) {
+          return;
+        }
+
         if (this.latched && this.currentTarget) {
             // Follow the latched target's movements
             this.x = this.currentTarget.x;
