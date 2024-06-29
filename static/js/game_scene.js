@@ -63,6 +63,9 @@ class GameScene extends Phaser.Scene {
             case 'wait_for_event':
                 this.handleWaitForEvent(event.event, event.target);
                 break;
+            case 'event':
+                this.handleRaiseEvent(event.event, event.scene);
+                break;
             default:
                 console.warn('Unknown event type:', event.type);
                 this.processNextEvent();
@@ -82,15 +85,22 @@ class GameScene extends Phaser.Scene {
     }
 
     handleNewObjective(objective) {
-        this.events.emit('new_objective', objective);
+        this.scene.get('UIScene').renderObjective(objective);
         this.processNextEvent();
     }
 
     handleWaitForEvent(eventName, targetId) {
+        console.log(`[GAME] Waiting for ${eventName} on target ${targetId}`);
         const mainScene = this.scene.get('MainScene');
         mainScene.shipIDMap.get(targetId).once(eventName, () => {
           this.processNextEvent();
         });
+    }
+
+    handleRaiseEvent(eventName, sceneID) {
+        console.log(`[GAME] Emitting event ${eventName} on ${sceneID}`);
+        const scene = this.scene.get(sceneID);
+        scene.events.emit(eventName);
     }
 
     handleStage(target, interactive) {

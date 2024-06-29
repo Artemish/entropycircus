@@ -36,7 +36,7 @@ class Ship extends Phaser.GameObjects.Sprite {
         }
         this.body.setDrag(20);
         this.body.setBounce(0);
-        this.body.setMaxSpeed(200);
+        this.body.setMaxSpeed(30 * ship.movespeed);
 
         // Assuming the ship images are square and you want the ship's diameter to match 2 * radius
         const originalImageSize = this.width; // This assumes the image is square
@@ -62,7 +62,7 @@ class Ship extends Phaser.GameObjects.Sprite {
     set_target(ship) {
       this.target = ship;
       this.fireMissileTimer = this.scene.time.addEvent({
-          delay: Math.random() * 10000 + 3000,          // delay in milliseconds
+          delay: Math.random() * 2500 + 750,          // delay in milliseconds
           callback: () => this.fireMissile(300),
           callbackScope: this,
           loop: true             // set to false if you don't want it to repeat
@@ -88,12 +88,13 @@ class Ship extends Phaser.GameObjects.Sprite {
     }
 
     move_towards_target() {
-        const speed = this.moveSpeed * 5;
-        const intercept = this.interceptCourse(this.target, speed);
+        this.scene.physics.moveToObject(this, this.target, null, 2000);
+        // const speed = this.moveSpeed * 5;
+        // const intercept = this.interceptCourse(this.target, speed);
 
-        const angle = Phaser.Math.Angle.Between(0, 0, intercept.x, intercept.y);
+        const angle = Phaser.Math.Angle.Between(this.x, this.y, this.target.x, this.target.y);
         this.setRotation(angle);
-        this.scene.physics.velocityFromRotation(this.rotation, speed, this.body.acceleration);
+
     }
 
     // move_towards_target() { 

@@ -23,6 +23,8 @@ class Missile extends Phaser.GameObjects.Sprite {
           Math.sin(ship.rotation) * speed
         );
 
+        this.body.setMass(0.1);
+
         this.displayWidth = ship.radius * 5;
         this.displayHeight = ship.radius * 5;
     }

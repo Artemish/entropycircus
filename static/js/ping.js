@@ -81,5 +81,6 @@ class Ping extends Phaser.GameObjects.Sprite {
 
         // You can also emit an event or call a method on the target to indicate it has been pinged
         this.currentTarget.emit('pinged', this);
+        this.currentTarget.once('destroy', () => this.destroy());
     }
 }

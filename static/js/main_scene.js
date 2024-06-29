@@ -55,6 +55,7 @@ class MainScene extends Phaser.Scene {
         console.log("Adding starfield");
         this.starField = this.add.tileSprite(0, 0, width*2, height*2, 'star_field_far');
         this.starField.setScale(3.0);
+        this.starField.setAlpha(0.3);
     }
 
     getInViewShipCoords() {
@@ -90,6 +91,44 @@ class MainScene extends Phaser.Scene {
       });
 
       return results;
+    }
+
+    wolfpackCharge() {
+      console.log('[MAIN] Initiating wolfpack charge');
+      const target = this.shipIDMap.get('BATTLESHIP');
+      const player = this.shipIDMap.get('PLAYER');
+      const distance = 1000;
+
+      // Calculate the angle between the ship and the pointer
+      const player_angle = Phaser.Math.Angle.Between(player.x, player.y, target.x, target.y);
+      // Attack from the opposite side
+      const attack_angle = (player_angle + Math.PI) % (2*Math.PI);
+
+      // Calculate the new x and y positions
+      const start_x = target.x + Math.cos(player_angle) * distance;
+      const start_y = target.y + Math.sin(player_angle) * distance;
+
+      const formation_angle = (attack_angle + Math.PI / 2) % (2*Math.PI);
+
+      const offset_x = Math.cos(formation_angle) * 100;
+      const offset_y = Math.sin(formation_angle) * 100;
+
+      for (let i = -2; i < 3; i++) {
+        let x = start_x + i * offset_x;
+        let y = start_y + i * offset_y;
+
+        let ship_info = {
+          ship: "jester_medium_fighter",
+          team: "ally",
+          pos: {x: x, y: y, rot: attack_angle}
+        };
+
+        this.spawn_ship(ship_info, target);
+      }
+    }
+
+    registerLevelEvents() { 
+      this.events.on('wolfpack_charge', this.wolfpackCharge, this)
     }
 
     create() {
@@ -173,6 +212,7 @@ class MainScene extends Phaser.Scene {
         this.scene.get('GameScene').events.emit('scene_ready', {scene: 'MainScene'});
 
         this.gameoverMusic = this.sound.add('gameover_music');
+        this.registerLevelEvents();
     }
 
     spawnOneEnemy() {
@@ -185,7 +225,7 @@ class MainScene extends Phaser.Scene {
       const y = target.y + Math.sin(angle) * distance;
 
       const ship_info = {
-        ship: "7th_fleet_fighter",
+        ship: "7th_fleet_medium_fighter",
         team: "enemy",
         pos: {x: x, y: y, rot: angle}
       };
@@ -196,9 +236,9 @@ class MainScene extends Phaser.Scene {
     handleFireMissile() {
         const currentTime = this.time.now;
 
-        if (currentTime > this.cooldowns.missile) {
+        if (currentTime > this.cooldowns.missile && this.ship.active) {
             this.ship.fireMissile(400);
-            this.cooldowns.missile = currentTime + 1000; // 1 second cooldown
+            this.cooldowns.missile = currentTime + 250; // 0.25 second cooldown
         } else {
             console.log('Missile is on cooldown!');
         }
@@ -207,7 +247,7 @@ class MainScene extends Phaser.Scene {
     handleFirePing() {
         const currentTime = this.time.now;
 
-        if (currentTime > this.cooldowns.ping) {
+        if (currentTime > this.cooldowns.ping && this.ship.active) {
             this.ship.firePing();
             this.cooldowns.ping = currentTime + 1000; // 1 second cooldown
         } else {
@@ -284,8 +324,8 @@ class MainScene extends Phaser.Scene {
         // Handle collision between two ships
         // console.log('Collision detected between two ships', ship1, ship2);
         // Example: deal damage to both ships
-        ship1.takeDamage(2);
-        ship2.takeDamage(2);
+        ship1.takeDamage(0);
+        ship2.takeDamage(0);
     }
 
     handleShipMissileCollision(ship, missile) {
@@ -352,7 +392,7 @@ class MainScene extends Phaser.Scene {
             }
 
             if (this.wKey.isDown) {
-                this.physics.velocityFromRotation(this.ship.rotation, this.ship.moveSpeed * 20, this.ship.body.acceleration);
+                this.physics.velocityFromRotation(this.ship.rotation, this.ship.moveSpeed * 10, this.ship.body.acceleration);
             } else {
                 this.ship.body.setAcceleration(0);
             }

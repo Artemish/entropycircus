@@ -68,14 +68,14 @@
           ]
         },
         {
-          "speaker": "ringleader", 
+          "speaker": "jester_22", 
           "lines": [
             "Sir, yes, sir."
           ]
         }
       ]
     },
-    {"type": "new_objective", "objective": "Find the HKM battleship"},
+    {"type": "new_objective", "objective": "Ping (E key) the HKM battleship"},
     {"type": "stage", "target": "level1_battleshipfight", "interactive": true},
     {"type": "wait_for_event", "event": "pinged", "target": "BATTLESHIP"},
     {
@@ -101,7 +101,8 @@
         }
       ]
     },
-    { "type": "scene", "target": "wolfpack_charge" },
+    {"type": "event", "event": "wolfpack_charge", "scene": "MainScene"},
+    {"type": "wait_for_event", "event": "destroy", "target": "BATTLESHIP"},
     {
       "type": "dialogue",
       "script": [

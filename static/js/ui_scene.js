@@ -111,4 +111,28 @@ class UIScene extends Phaser.Scene {
       this.minimapGraphics.fillCircle(shipX, shipY, 5);
     });
   }
+
+  renderObjective(objective) {
+    const cameraWidth = this.cameras.main.width;
+    const cameraHeight = this.cameras.main.height;
+
+    const aspectRatio = cameraWidth / cameraHeight;
+    const minimapHeight = 100; // Size of the minimap
+    const minimapWidth = minimapHeight * aspectRatio; // Size of the minimap
+
+    const minimapX = this.cameras.main.width - minimapWidth;
+
+    // If the objective text already exists, update its content
+    if (this.objectiveText) {
+      this.objectiveText.setText(objective);
+    } else {
+      // Create the objective text
+      this.objectiveText = this.add.text(minimapX, minimapHeight + 10, objective, {
+        fontSize: '18px',
+        fill: '#ffffff',
+        align: 'left',
+        wordWrap: { width: minimapWidth }
+      }).setOrigin(0, 0);
+    }
+  }
 }

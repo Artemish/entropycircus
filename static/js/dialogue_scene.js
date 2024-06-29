@@ -11,10 +11,17 @@ class DialogueScene extends Phaser.Scene {
 
     preload() {
       this.load.json('characters', 'assets/characters.json');
-      this.script.forEach((scriptLine) => {
-        this.load.image(scriptLine.speaker, `assets/portraits/anime_ring_leader_maybe.jpg`);
-        // this.load.image(scriptLine.speaker, `assets/portraits/${scriptLine.speaker}.png`);
-      });
+      // this.script.forEach((scriptLine) => {
+      //   this.load.image(scriptLine.speaker, `assets/portraits/anime_ring_leader_maybe.jpg`);
+      //   // this.load.image(scriptLine.speaker, `assets/portraits/${scriptLine.speaker}.png`);
+      // });
+
+      this.load.image("jester_22",     "assets/portraits/anime_jester.jpg");
+      this.load.image("ringleader",    "assets/portraits/anime_ring_leader_maybe.jpg");
+      this.load.image("tanizaki",      "assets/portraits/anime_ensign_Tanizaki.jpg");
+      this.load.image("captain_rand",  "assets/portraits/anime_captain_rand.jpg");
+      this.load.image("high_command",  "assets/portraits/anime_high_command_member.jpg");
+      this.load.image("admiral_luci",  "assets/portraits/anime_admiral_luci.jpg");
     }
 
     create() {

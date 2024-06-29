@@ -4,22 +4,23 @@
     "radius": 10.0,
     "display": "Medium Fighter",
     "point_cost": 1,
-    "shields": 2,
-    "hull": 2,
-    "movespeed": 6,
-    "evasion": "5+d6",
-    "attacks": [
-      {"name": "guns", "range": 3, "damage": "2+d2", "speed": 8},
-      {"name": "missiles", "range": 3, "damage": "2+d2", "speed": 6}
-    ]
-  },
-  {
-    "shipcode": "7th_fleet_fighter",
-    "radius": 10.0,
-    "display": "7th Fleet Fighter",
-    "point_cost": 1,
     "shields": 8,
-    "hull": 2,
+    "hull": 8,
+    "movespeed": 6,
+    "acceleration": 300,
+    "evasion": "5+d6",
+    "attacks": [
+      {"name": "guns", "range": 3, "damage": "2+d2", "speed": 8},
+      {"name": "missiles", "range": 3, "damage": "2+d2", "speed": 6}
+    ]
+  },
+  {
+    "shipcode": "jester_medium_fighter",
+    "radius": 10.0,
+    "display": "Jester Fighter",
+    "point_cost": 1,
+    "shields": 12,
+    "hull": 8,
     "movespeed": 6,
     "evasion": "5+d6",
     "attacks": [
@@ -28,9 +29,9 @@
     ]
   },
   {
-    "shipcode": "7th_fleet_gunship",
+    "shipcode": "jester_gunship",
     "radius": 20.0,
-    "display": "7th Fleet Gunship",
+    "display": "Jester Gunship",
     "point_cost": 4,
     "shields": 8,
     "hull": 12,
@@ -42,9 +43,9 @@
     ]
   },
   {
-    "shipcode": "7th_fleet_lance",
+    "shipcode": "jester_lance",
     "radius": 30.0,
-    "display": "Lance (7th Fleet)",
+    "display": "Lance (Jester)",
     "point_cost": 4,
     "shields": 15,
     "hull": 30,
@@ -57,9 +58,9 @@
     ]
   },
   {
-    "shipcode": "7th_fleet_freighter",
+    "shipcode": "jester_freighter",
     "radius": 30.0,
-    "display": "Freighter (7th Fleet)",
+    "display": "Freighter (Jester)",
     "point_cost": 4,
     "shields": 8,
     "hull": 12,
@@ -71,9 +72,9 @@
     ]
   },
   {
-    "shipcode": "7th_fleet_carrier",
+    "shipcode": "jester_carrier",
     "radius": 50.0,
-    "display": "Carrier (7th Fleet)",
+    "display": "Carrier (Jester)",
     "point_cost": 4,
     "shields": 8,
     "hull": 12,
@@ -81,6 +82,35 @@
     "evasion": "5+d6",
     "attacks": [
       {"name": "guns", "range": 3, "damage": "2+d2", "speed": 8, "copies": 4},
+      {"name": "missiles", "range": 3, "damage": "2+d2", "speed": 6}
+    ]
+  },
+  {
+    "shipcode": "hkm_lance",
+    "radius": 30.0,
+    "display": "Lance (HKM)",
+    "point_cost": 4,
+    "shields": 60,
+    "hull": 120,
+    "movespeed": 4,
+    "mass": 100,
+    "evasion": "5+d6",
+    "attacks": [
+      {"name": "guns", "range": 3, "damage": "2+d2", "speed": 8, "copies": 4},
+      {"name": "missiles", "range": 3, "damage": "2+d2", "speed": 6}
+    ]
+  },
+  {
+    "shipcode": "7th_fleet_medium_fighter",
+    "radius": 10.0,
+    "display": "7th Fleet Fighter",
+    "point_cost": 1,
+    "shields": 4,
+    "hull": 2,
+    "movespeed": 6,
+    "evasion": "5+d6",
+    "attacks": [
+      {"name": "guns", "range": 3, "damage": "2+d2", "speed": 8},
       {"name": "missiles", "range": 3, "damage": "2+d2", "speed": 6}
     ]
   }

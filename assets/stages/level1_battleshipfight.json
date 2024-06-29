@@ -9,6 +9,6 @@
   },
   "ships": [
     {"ship": "player_fighter", "id": "PLAYER", "team": "ally", "pos": {"x": 200, "y": 200, "rot": 0}},
-    {"ship": "7th_fleet_lance", "id": "BATTLESHIP", "team": "enemy", "pos": {"x": 2000, "y": 1800, "rot": 200}}
+    {"ship": "hkm_lance", "id": "BATTLESHIP", "team": "enemy", "pos": {"x": 2000, "y": 1800, "rot": 200}}
   ]
 }
