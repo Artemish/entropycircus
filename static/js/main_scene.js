@@ -1,3 +1,5 @@
+let mainScene = null;
+
 class MainScene extends Phaser.Scene {
     constructor() {
         super({ key: 'MainScene' });
@@ -15,6 +17,7 @@ class MainScene extends Phaser.Scene {
     preload() { 
         this.load.image('ping', 'assets/ping.png');
         this.load.image('gameover', 'assets/gameover.png');
+        this.load.image('shieldOverlay', 'assets/shield_overlay.png');
 
         const shipdata = this.cache.json.get('shipdata');
         console.log("Found ship data: ", shipdata);
@@ -30,8 +33,8 @@ class MainScene extends Phaser.Scene {
 
     adjustZoom(deltaY) {
         const zoomFactor = 0.1; // Change this value to adjust the zoom sensitivity
-        const minZoom = 0.5; // Minimum zoom level
-        const maxZoom = 2; // Maximum zoom level
+        const minZoom = 0.3; // Minimum zoom level
+        const maxZoom = 1; // Maximum zoom level
 
         let newZoom = this.cameras.main.zoom;
 
@@ -132,6 +135,8 @@ class MainScene extends Phaser.Scene {
     }
 
     create() {
+        mainScene = this;
+
         this.stage = this.cache.json.get(this.stage_id);
         this.ships = this.physics.add.group();
         this.missiles = this.physics.add.group();
@@ -261,6 +266,7 @@ class MainScene extends Phaser.Scene {
         if (this.stage.interactive) {
             this.uiScene.renderMinimap(this.ships.getChildren());
             this.uiScene.renderCooldowns(this.cooldowns);
+            this.uiScene.renderHP(this.ship);
         }
     }
 

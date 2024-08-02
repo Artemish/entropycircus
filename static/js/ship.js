@@ -54,8 +54,25 @@ class Ship extends Phaser.GameObjects.Sprite {
         // this.updateBars();
 
         this.fireMissileTimer = null;
+        this.add_shield_overlay();
 
         // this.once('destroy', this.onPlayerShipDestroyed, this);
+    }
+
+    
+    add_shield_overlay() { 
+      console.log("Adding shield overlay to ship: ", this);
+      let aspectRatio = this.height / this.width;
+      let shield = this.scene.add.image(this.x, this.y, 'shieldOverlay');
+
+      shield.setOrigin(0.5, 0.5);
+      shield.setAlpha(0.6);
+      shield.displayWidth = this.displayWidth * 1.1;
+      shield.displayHeight = this.displayHeight * 1.1;
+
+      // shield.setScale(aspectRatio, 1);
+
+      this.shield = shield;
     }
 
 
@@ -63,10 +80,17 @@ class Ship extends Phaser.GameObjects.Sprite {
       this.target = ship;
       this.fireMissileTimer = this.scene.time.addEvent({
           delay: Math.random() * 2500 + 750,          // delay in milliseconds
-          callback: () => this.fireMissile(300),
+          callback: this.fire_at_target,
           callbackScope: this,
           loop: true             // set to false if you don't want it to repeat
       });
+    }
+
+    fire_at_target() {
+      const missileSpeed = 300;
+      if (this.has_target()) {
+        this.fireMissile(missileSpeed)
+      }
     }
 
     interceptCourse(target, speed) {
@@ -112,6 +136,7 @@ class Ship extends Phaser.GameObjects.Sprite {
       if (this.has_target()) {
         this.move_towards_target();
       }
+      this.shield.x = this.x; this.shield.y = this.y; this.shield.rotation = this.rotation;
       // this.updateBars();
     }
 
@@ -119,10 +144,15 @@ class Ship extends Phaser.GameObjects.Sprite {
     takeDamage(amount) {
         // console.log("Taking damage");
         this.shields -= amount;
-        if (this.shields < 0) {
+        if (this.shields <= 0) {
             this.hull += this.shields;
             this.shields = 0;
+            this.shield.setAlpha(0.0);
+        } else {
+          const shieldPercentage = this.shields / this.maxShields;
+          this.shield.setAlpha(0.2 + 0.4 * shieldPercentage);
         }
+
         if (this.hull <= 0) {
             this.destroy();
         }
@@ -139,6 +169,7 @@ class Ship extends Phaser.GameObjects.Sprite {
     }
 
     destroy(fromScene) {
+        this.shield.destroy();
         // Cancel the fire missile timer
         if (this.fireMissileTimer) {
             this.fireMissileTimer.remove();

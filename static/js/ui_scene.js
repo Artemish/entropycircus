@@ -13,6 +13,26 @@ class UIScene extends Phaser.Scene {
     ];
 
     this.cooldownOverlays = {};
+
+    this.barWidth = 200;
+    this.barHeight = 30;
+
+    this.healthBar = this.add.graphics({x: 20, y: 20});
+    this.shieldBar = this.add.graphics({x: 20, y: 70});
+  }
+
+  renderHP(ship) {
+    this.healthBar.clear();
+    this.shieldBar.clear();
+
+    let healthPercentage = ship.hull / ship.maxHull;
+    let shieldPercentage = ship.shields / ship.maxShields;
+
+    this.healthBar.fillStyle(0xff0000);
+    this.healthBar.fillRect(0, 0, this.barWidth * healthPercentage, this.barHeight);
+
+    this.shieldBar.fillStyle(0x0000ff);
+    this.shieldBar.fillRect(0, 0, this.barWidth * shieldPercentage, this.barHeight);
   }
 
   renderCooldowns(cooldowns = {}) {
@@ -39,7 +59,7 @@ class UIScene extends Phaser.Scene {
   }
 
   renderHotbar() {
-    const barWidth = 600;
+    const barWidth = 300;
     const barHeight = 100;
     const barX = (this.cameras.main.width - barWidth) / 2;
     const barY = this.cameras.main.height - barHeight - 20;
