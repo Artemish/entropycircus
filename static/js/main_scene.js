@@ -10,7 +10,9 @@ class MainScene extends Phaser.Scene {
         this.stage_id = stage_id;
         this.cooldowns = {
             missile: 0,
-            ping: 0
+            ping: 0,
+            strafeLeft: 0,
+            strafeRight: 0,
         };
     }
 
@@ -18,6 +20,8 @@ class MainScene extends Phaser.Scene {
         this.load.image('ping', 'assets/ping.png');
         this.load.image('gameover', 'assets/gameover.png');
         this.load.image('shieldOverlay', 'assets/shield_overlay.png');
+        this.load.image('strafeLeft', 'assets/left_arrow.png');
+        this.load.image('strafeRight', 'assets/right_arrow.png');
 
         const shipdata = this.cache.json.get('shipdata');
         console.log("Found ship data: ", shipdata);
@@ -166,8 +170,16 @@ class MainScene extends Phaser.Scene {
         }
 
         if (this.stage.interactive) {
-          this.input.keyboard.on('keydown-Q', this.handleFireMissile, this);
-          this.input.keyboard.on('keydown-E', this.handleFirePing, this);
+          this.input.keyboard.on('keydown-F', this.handleFireMissile, this);
+          this.input.keyboard.on('keydown-SPACE', this.handleFirePing, this);
+          this.input.keyboard.on('keydown-Q', this.handleStrafeLeft, this);
+          this.input.keyboard.on('keydown-E', this.handleStrafeRight, this);
+
+          // Listen for the Escape key to resume the game
+          this.input.keyboard.on('keydown-ESC', this.pauseGame, this);
+      
+          this.input.on('pointerdown', this.handleMouseClick, this);
+          this.input.mouse.disableContextMenu();
 
           this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
               this.adjustZoom(deltaY);
@@ -205,7 +217,7 @@ class MainScene extends Phaser.Scene {
           this.uiScene.renderHotbar();
 
           this.uiTimer = this.time.addEvent({
-            delay: 250,
+            delay: 200,
             callback: this.renderUI,
             callbackScope: this,
             loop: true
@@ -253,6 +265,7 @@ class MainScene extends Phaser.Scene {
         if (currentTime > this.cooldowns.missile && this.ship.active) {
             this.ship.fireMissile(400);
             this.cooldowns.missile = currentTime + 250; // 0.25 second cooldown
+            this.uiScene.showCooldownBar('missile', 250);
         } else {
             console.log('Missile is on cooldown!');
         }
@@ -263,18 +276,41 @@ class MainScene extends Phaser.Scene {
 
         if (currentTime > this.cooldowns.ping && this.ship.active) {
             this.ship.firePing();
-            this.cooldowns.ping = currentTime + 1000; // 1 second cooldown
+            this.cooldowns.ping = currentTime + 5000; // 1 second cooldown
+            this.uiScene.showCooldownBar('ping', 5000);
         } else {
             console.log('Ping is on cooldown!');
         }
     }
 
+    handleStrafeLeft() {
+        const currentTime = this.time.now;
 
+        if (currentTime > this.cooldowns.strafeLeft && this.ship.active) {
+            this.ship.strafeLeft();
+            this.cooldowns.strafeLeft = currentTime + 1000; // 1 second cooldown
+            this.uiScene.showCooldownBar('strafeLeft', 1000);
+        } else {
+            console.log('Strafe is on cooldown!');
+        }
+    }
+
+    handleStrafeRight() {
+        const currentTime = this.time.now;
+
+        if (currentTime > this.cooldowns.strafeRight && this.ship.active) {
+            this.ship.strafeRight();
+            this.cooldowns.strafeRight = currentTime + 1000; // 1 second cooldown
+            this.uiScene.showCooldownBar('strafeRight', 1000);
+        } else {
+            console.log('Strafe is on cooldown!');
+        }
+    }
 
     renderUI() {
         if (this.stage.interactive) {
             this.uiScene.renderMinimap(this.ships.getChildren());
-            this.uiScene.renderCooldowns(this.cooldowns);
+            // this.uiScene.renderCooldowns(this.cooldowns);
             this.uiScene.renderHP(this.ship);
         }
     }

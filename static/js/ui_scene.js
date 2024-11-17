@@ -7,8 +7,10 @@ class UIScene extends Phaser.Scene {
     // Create graphics object for minimap
     this.minimapGraphics = this.add.graphics();
     this.actions = [
-      { icon: 'bullet', ability: 'missile', hotkey: 'Q' },
-      { icon: 'ping', ability: 'ping', hotkey: 'E' },
+      { icon: 'strafeLeft', ability: 'strafeLeft', hotkey: 'Q' },
+      { icon: 'bullet_hotbar', ability: 'missile', hotkey: 'M1' },
+      { icon: 'ping', ability: 'ping', hotkey: 'M2' },
+      { icon: 'strafeRight', ability: 'strafeRight', hotkey: 'E' },
       // Add more actions as needed
     ];
 
@@ -35,6 +37,19 @@ class UIScene extends Phaser.Scene {
     this.shieldBar.fillRect(0, 0, this.barWidth * shieldPercentage, this.barHeight);
   }
 
+  showCooldownBar(ability, duration) {
+    const cooldownOverlay = this.cooldownOverlays[ability];
+    const iconSize = 64; // Size of the icons
+    cooldownOverlay.displayHeight = iconSize;
+
+    this.tweens.add({
+      targets: cooldownOverlay,
+      displayHeight: 0,
+      duration: duration,
+      ease: "linear"
+    });
+  }
+
   renderCooldowns(cooldowns = {}) {
     const currentTime = this.scene.get('MainScene').time.now;
 
@@ -47,13 +62,13 @@ class UIScene extends Phaser.Scene {
         if (cooldownTime > 0) {
           const iconSize = 64; // Size of the icons
           const cooldownHeight = (cooldownTime / 1000) * iconSize;
-          cooldownOverlay.setDisplaySize(iconSize, cooldownHeight);
-          cooldownOverlay.y = cooldownOverlay.y + iconSize / 2; // Adjust position to start from the bottom
+          cooldownOverlay.displayHeight = cooldownHeight;
+          // cooldownOverlay.y = cooldownOverlay.y + iconSize / 2; // Adjust position to start from the bottom
         } else {
-          cooldownOverlay.setDisplaySize(0, 0); // Hide cooldown overlay if not in cooldown
+          cooldownOverlay.displayHeight = 0; // Hide cooldown overlay if not in cooldown
         }
       } else {
-        cooldownOverlay.setDisplaySize(0, 0); // Hide cooldown overlay if no cooldown data
+        cooldownOverlay.displayHeight = 0; // Hide cooldown overlay if no cooldown data
       }
     }
   }
@@ -84,8 +99,11 @@ class UIScene extends Phaser.Scene {
       hotkeyText.hotbar = true;
 
       // Create placeholder for the cooldown overlay
-      const cooldownOverlay = this.add.rectangle(iconX, iconY, iconSize, 0, 0xffffff, 0.5).setOrigin(0.5, 1);
+      const cooldownOverlay = this.add.rectangle(iconX, iconY + iconSize / 2, iconSize, iconSize, 0xffffff, 0.4).setOrigin(0.5, 1);
       cooldownOverlay.hotbar = true;
+      cooldownOverlay.depth = 1;
+      cooldownOverlay.displayHeight = 0;
+
       this.cooldownOverlays[action.ability] = cooldownOverlay;
     });
   }

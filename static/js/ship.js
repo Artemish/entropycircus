@@ -168,6 +168,27 @@ class Ship extends Phaser.GameObjects.Sprite {
         const ping = new Ping(this.scene, this.x, this.y, this);
     }
 
+    strafe(angle) {
+        // Calculate the strafe direction (perpendicular to the ship's current rotation)
+        const strafeAngle = this.rotation + angle; // 90 degrees counterclockwise
+
+        // Calculate the velocity components
+        const strafeVelocityX = Math.cos(strafeAngle) * 400; // Adjust the multiplier for the burst strength
+        const strafeVelocityY = Math.sin(strafeAngle) * 400;
+
+        // Apply the velocity burst
+        this.body.setVelocityX(this.body.velocity.x + strafeVelocityX);
+        this.body.setVelocityY(this.body.velocity.y + strafeVelocityY);
+    }
+
+    strafeLeft() {
+        this.strafe(-1 * Phaser.Math.PI2 / 4);
+    }
+
+    strafeRight() {
+        this.strafe(Phaser.Math.PI2 / 4);
+    }
+
     destroy(fromScene) {
         this.shield.destroy();
         // Cancel the fire missile timer
