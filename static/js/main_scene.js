@@ -34,6 +34,19 @@ class MainScene extends Phaser.Scene {
         
         this.load.audio('playerDead', 'assets/sfx/player_death.mp3');
     }
+  
+    handleMouseClick(pointer) {
+        // console.log("Requesting pointer lock");
+        // this.input.mouse.requestPointerLock();
+
+        if (pointer.buttons === 1) {
+            // Left click action
+            this.handleFireMissile();
+        } else if (pointer.buttons === 2) {
+            // Right click action
+            this.handleFirePing();
+        }
+    }
 
     adjustZoom(deltaY) {
         const zoomFactor = 0.1; // Change this value to adjust the zoom sensitivity
@@ -443,7 +456,7 @@ class MainScene extends Phaser.Scene {
             }
 
             if (this.wKey.isDown) {
-                this.physics.velocityFromRotation(this.ship.rotation, this.ship.moveSpeed * 10, this.ship.body.acceleration);
+                this.physics.velocityFromRotation(this.ship.rotation, 300, this.ship.body.acceleration);
             } else {
                 this.ship.body.setAcceleration(0);
             }
