@@ -54,14 +54,26 @@ class Ship extends Phaser.GameObjects.Sprite {
         // this.updateBars();
 
         this.fireMissileTimer = null;
+        this.shieldRegenTimer = null;
+
         this.add_shield_overlay();
+
+        this.shieldRegenRate = 1; // Amount to regenerate per second
+        this.shieldRegenDelay = 3000; // Delay in milliseconds before shields start regenerating
+
+        // Internal variables to control shield regeneration
+        this.isRegenPaused = false;
+        this.lastDamageTime = 0;
+
+        // scene.sys.updateList.add(this);
+        // scene.sys.displayList.add(this);
 
         // this.once('destroy', this.onPlayerShipDestroyed, this);
     }
 
     
     add_shield_overlay() { 
-      console.log("Adding shield overlay to ship: ", this);
+      // console.log("Adding shield overlay to ship: ", this);
       let aspectRatio = this.height / this.width;
       let shield = this.scene.add.image(this.x, this.y, 'shieldOverlay');
 
@@ -132,30 +144,72 @@ class Ship extends Phaser.GameObjects.Sprite {
       return ((this.target !== null) && (this.target.active));
     }
 
-    update() { 
+    check_shield_regen(time, delta) {
+      if (!this.isRegenPaused && this.shields < this.maxShields) {
+        const regenAmount = (this.shieldRegenRate * delta) / 1000; // Scale regen by delta time
+        this.shields = Math.min(this.shields + regenAmount, this.maxShields);
+
+        // Update shield transparency based on the new shield value
+        const shieldPercentage = this.shields / this.maxShields;
+        this.shield.setAlpha(0.2 + 0.4 * shieldPercentage);
+      }
+    }
+
+    update(time, delta) { 
+      this.shield.x = this.x;
+      this.shield.y = this.y;
+      this.shield.rotation = this.rotation;
+      const shieldRegenRate = 1;
+
+      if (!this.isRegenPaused && this.shields < this.maxShields) {
+        const regenAmount = (shieldRegenRate * delta) / 1000;
+        this.adjustShields(regenAmount);
+      }
+
       if (this.has_target()) {
         this.move_towards_target();
       }
-      this.shield.x = this.x; this.shield.y = this.y; this.shield.rotation = this.rotation;
-      // this.updateBars();
     }
+
+    adjustShields(amount) {
+      let newShields = Math.max(Math.min(this.shields + amount, this.maxShields), 0);
+      this.shields = newShields;
+
+      if (this.shields <= 0) {
+          this.shield.setAlpha(0.0);
+      } else {
+        const shieldPercentage = this.shields / this.maxShields;
+        this.shield.setAlpha(0.2 + 0.4 * shieldPercentage);
+      }
+    }
+
 
     // Example method: damage the ship
     takeDamage(amount) {
-        // console.log("Taking damage");
-        this.shields -= amount;
-        if (this.shields <= 0) {
-            this.hull += this.shields;
-            this.shields = 0;
-            this.shield.setAlpha(0.0);
+        // Shield will absorb any hit
+        if (this.shields > 0) {
+          this.adjustShields(-1 * amount);
         } else {
-          const shieldPercentage = this.shields / this.maxShields;
-          this.shield.setAlpha(0.2 + 0.4 * shieldPercentage);
+          this.hull -= amount;
         }
 
         if (this.hull <= 0) {
             this.destroy();
+            return;
         }
+
+        // Reset shield regeneration delay
+        this.isRegenPaused = true;
+        this.lastDamageTime = this.scene.time.now; // Set the current time as the last damage time
+
+        if (this.shieldRegenTimer) {
+          this.shieldRegenTimer.remove();
+        }
+
+        // Start a timer to re-enable shield regeneration after the delay
+        this.shieldRegenTimer = this.scene.time.delayedCall(this.shieldRegenDelay, () => {
+            this.isRegenPaused = false;
+        });
         // this.updateBars();
     }
 
@@ -191,9 +245,14 @@ class Ship extends Phaser.GameObjects.Sprite {
 
     destroy(fromScene) {
         this.shield.destroy();
+
         // Cancel the fire missile timer
         if (this.fireMissileTimer) {
             this.fireMissileTimer.remove();
+        }
+
+        if (this.shieldRegenTimer) {
+            this.shieldRegenTimer.remove();
         }
         super.destroy(fromScene);
     }
