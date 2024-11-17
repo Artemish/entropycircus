@@ -61,6 +61,12 @@ class MainScene extends Phaser.Scene {
         this.starField.setAlpha(0.3);
     }
 
+    pauseGame() {
+      console.log("Pausing the game!");
+      this.scene.pause();
+      this.scene.launch('PauseScene', {parentSceneKey: 'MainScene'});
+    }
+
     getInViewShipCoords() {
       const camera = this.cameras.main;
       const worldView = camera.worldView;
@@ -218,6 +224,9 @@ class MainScene extends Phaser.Scene {
 
         this.gameoverMusic = this.sound.add('gameover_music');
         this.registerLevelEvents();
+
+        this.events.on('pause', () => { this.scene.pause('UIScene'); }, this);
+        this.events.on('resume', () => { this.scene.resume('UIScene'); }, this);
     }
 
     spawnOneEnemy() {

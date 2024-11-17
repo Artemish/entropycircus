@@ -24,6 +24,8 @@ var config = {
       DialogueScene,
       GameScene,
       JournalLogScene,
+      PauseScene,
+      SettingsScene,
     ] 
 };
 
