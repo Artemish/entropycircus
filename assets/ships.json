@@ -6,7 +6,7 @@
     "point_cost": 1,
     "shields": 8,
     "hull": 8,
-    "movespeed": 6,
+    "movespeed": 20,
     "acceleration": 300,
     "evasion": "5+d6",
     "attacks": [

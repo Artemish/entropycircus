@@ -12,9 +12,12 @@ class TitleScene extends Phaser.Scene {
         this.load.image('minus', 'assets/minus.png');
         this.load.image('background', 'assets/background.jpg');
         this.load.image('star_field_far', 'assets/star_field_far.png');
+        this.load.image('nasa_1', 'assets/NASA_level_1.jpg');
         this.load.image('star_field_close', 'assets/star_field_close.png');
         this.load.image('nasa_level_1_bg', 'assets/NASA_level_1.jpg');
-        this.load.image('bullet', 'assets/bullet.webp');
+        this.load.image('bullet', 'assets/bullet.jpg');
+        this.load.image('bullet_hotbar', 'assets/bullet_hotbar.jpg');
+        this.load.image('missile', 'assets/missile.png');
 
         this.load.audio('hitsound', 'assets/sfx/machinegun_hit.mp3');
         this.load.audio('missile_hit', 'assets/sfx/missile_hit.mp3');
