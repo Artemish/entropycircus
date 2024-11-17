@@ -161,7 +161,7 @@ class MainScene extends Phaser.Scene {
         mainScene = this;
 
         this.stage = this.cache.json.get(this.stage_id);
-        this.ships = this.physics.add.group();
+        this.ships = this.physics.add.group({runChildUpdate: true});
         this.missiles = this.physics.add.group();
         this.hitsound = this.sound.add('missile_hit');
         this.playerDead = this.sound.add('playerDead');
@@ -422,7 +422,7 @@ class MainScene extends Phaser.Scene {
         this.starField.x = this.cameras.main.scrollX;
         this.starField.y = this.cameras.main.scrollY;
 
-        this.ships.children.iterate((ship) => {ship.update();});
+        // this.ships.children.iterate((ship) => {ship.update();});
 
         if (this.stage.interactive) {
             this.point_ship_towards_cursor();
